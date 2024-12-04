@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "6676696388",
+    "project_id": "mahallaty0",
+    "storage_bucket": "mahallaty0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:6676696388:android:7434fb98f62383bdf4db11",
+        "android_client_info": {
+          "package_name": "com.alwasl.mahallaty"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxwVisYyFVRaD1c3LTu3hly_v4QwZV2mM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
