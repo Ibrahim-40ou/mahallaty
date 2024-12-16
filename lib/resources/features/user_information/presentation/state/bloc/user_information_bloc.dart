@@ -151,7 +151,7 @@ class UserInformationBloc
     preferences!.setString(
       'avatar',
       userInfo.avatar != null && uploadAvatar
-          ? await ImageService().downloadImage(userInfo.avatar!)
+          ? await ImageServices().downloadImage(userInfo.avatar!)
           : userInfo.avatar ?? '',
     );
   }

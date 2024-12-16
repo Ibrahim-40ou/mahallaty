@@ -2,12 +2,11 @@ import 'package:auto_route/auto_route.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import 'package:iconsax/iconsax.dart';
+import 'package:mahallaty/main.dart';
 import 'package:mahallaty/resources/core/routing/routes.gr.dart';
 import 'package:mahallaty/resources/core/services/internet_services.dart';
 import 'package:mahallaty/resources/core/sizing/size_config.dart';
-import 'package:mahallaty/main.dart';
 import 'package:mahallaty/resources/core/widgets/complaint.dart';
 
 import '../../../../core/utils/common_functions.dart';
@@ -26,15 +25,6 @@ class ComplaintsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        // if (preferences!.getString('deepLink') != null) {
-        //   AutoRouter.of(context)
-        //       .push(ComplaintDetailsRoute(id: preferences!.getString('deepLink')));
-        //   // preferences!.remove('deepLink');
-        // }
-      },
-    );
     bool isDarkMode = CommonFunctions().darkModeCheck(context);
     CommonFunctions().changeStatusBarColor(false, isDarkMode, context, null);
     return SafeArea(
@@ -69,13 +59,15 @@ class ComplaintsPage extends StatelessWidget {
               } else if (state is FetchComplaintsFailure) {
                 return _buildErrorMessage(context, state);
               } else {
-                complaints = state is FetchComplaintsSuccess ? state.complaints : [];
-                List<ImageCounterCubit> pageCubits = state is FetchComplaintsSuccess
-                    ? List.generate(
-                        complaints.length,
-                        (index) => ImageCounterCubit(),
-                      )
-                    : [];
+                complaints =
+                    state is FetchComplaintsSuccess ? state.complaints : [];
+                List<ImageCounterCubit> pageCubits =
+                    state is FetchComplaintsSuccess
+                        ? List.generate(
+                            complaints.length,
+                            (index) => ImageCounterCubit(),
+                          )
+                        : [];
                 return Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,

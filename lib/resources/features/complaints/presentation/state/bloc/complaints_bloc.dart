@@ -6,8 +6,8 @@ import '../../../../../core/cache/database_helper.dart';
 import '../../../../../core/services/image_services.dart';
 import '../../../../../core/services/internet_services.dart';
 import '../../../../../core/utils/result.dart';
-import '../../../data/datasources/local_complaints_datasource.dart';
 import '../../../data/datasources/complaints_datasource.dart';
+import '../../../data/datasources/local_complaints_datasource.dart';
 import '../../../data/models/complaint_model.dart';
 import '../../../data/repositories/complaints_repository_impl.dart';
 import '../../../domain/entities/complaint_entity.dart';
@@ -16,7 +16,6 @@ import '../../../domain/use_cases/delete_complaint_use_case.dart';
 import '../../../domain/use_cases/paginated_fetch_use_case.dart';
 
 part 'complaints_events.dart';
-
 part 'complaints_states.dart';
 
 class ComplaintsBloc extends Bloc<ComplaintsEvents, ComplaintsStates> {
@@ -32,6 +31,7 @@ class ComplaintsBloc extends Bloc<ComplaintsEvents, ComplaintsStates> {
     on<DeleteOfflineComplaints>(_delete);
     on<SerializationEvent>(_serialize);
     on<ComplaintsLogout>(_logout);
+    on<ExitAddComplaints>(_exitAddComplaints);
   }
 
   Future<void> _logout(
@@ -63,7 +63,7 @@ class ComplaintsBloc extends Bloc<ComplaintsEvents, ComplaintsStates> {
         complaints = result.data;
         await LocalComplaintsDatasource(
           databaseHelper: DatabaseHelper(),
-          imageService: ImageService(),
+          imageService: ImageServices(),
           httpsConsumer: HttpsConsumer(),
         ).storeComplaints(complaints);
         return emit(FetchComplaintsSuccess(complaints: complaints));
@@ -73,7 +73,7 @@ class ComplaintsBloc extends Bloc<ComplaintsEvents, ComplaintsStates> {
     } else {
       complaints = await LocalComplaintsDatasource(
         databaseHelper: DatabaseHelper(),
-        imageService: ImageService(),
+        imageService: ImageServices(),
         httpsConsumer: HttpsConsumer(),
       ).fetchComplaints();
       return emit(FetchComplaintsSuccess(complaints: complaints));
@@ -117,7 +117,7 @@ class ComplaintsBloc extends Bloc<ComplaintsEvents, ComplaintsStates> {
         if (success) {
           await LocalComplaintsDatasource(
             databaseHelper: DatabaseHelper(),
-            imageService: ImageService(),
+            imageService: ImageServices(),
             httpsConsumer: HttpsConsumer(),
           ).deleteAllWaitingComplaints();
         }
@@ -153,7 +153,7 @@ class ComplaintsBloc extends Bloc<ComplaintsEvents, ComplaintsStates> {
         if (success) {
           await LocalComplaintsDatasource(
             databaseHelper: DatabaseHelper(),
-            imageService: ImageService(),
+            imageService: ImageServices(),
             httpsConsumer: HttpsConsumer(),
           ).deleteAllDeletedComplaints();
         }
@@ -168,6 +168,7 @@ class ComplaintsBloc extends Bloc<ComplaintsEvents, ComplaintsStates> {
   void onChange(Change<ComplaintsStates> change) {
     super.onChange(change);
     if (kDebugMode) {
+      print('yoyo');
       print(change);
     }
   }
@@ -188,7 +189,7 @@ class ComplaintsBloc extends Bloc<ComplaintsEvents, ComplaintsStates> {
         complaints.removeAt(event.index);
         await LocalComplaintsDatasource(
           databaseHelper: DatabaseHelper(),
-          imageService: ImageService(),
+          imageService: ImageServices(),
           httpsConsumer: HttpsConsumer(),
         ).deleteComplaint(event.id);
         return emit(FetchComplaintsSuccess(complaints: complaints));
@@ -198,7 +199,7 @@ class ComplaintsBloc extends Bloc<ComplaintsEvents, ComplaintsStates> {
     } else {
       await LocalComplaintsDatasource(
         databaseHelper: DatabaseHelper(),
-        imageService: ImageService(),
+        imageService: ImageServices(),
         httpsConsumer: HttpsConsumer(),
       ).deleteComplaint(event.id);
       complaints.removeAt(event.index);
@@ -211,6 +212,13 @@ class ComplaintsBloc extends Bloc<ComplaintsEvents, ComplaintsStates> {
     Emitter<ComplaintsStates> emit,
   ) {
     return emit(NoImagesState());
+  }
+
+  void _exitAddComplaints(
+    ExitAddComplaints event,
+    Emitter<ComplaintsStates> emit,
+  ) {
+    emit(FetchComplaintsSuccess(complaints: complaints));
   }
 
   Future<void> _addComplaint(
@@ -229,7 +237,7 @@ class ComplaintsBloc extends Bloc<ComplaintsEvents, ComplaintsStates> {
       if (result.isSuccess) {
         await LocalComplaintsDatasource(
           databaseHelper: DatabaseHelper(),
-          imageService: ImageService(),
+          imageService: ImageServices(),
           httpsConsumer: HttpsConsumer(),
         ).addComplaint(event.complaint);
         complaints.add(event.complaint);
@@ -241,7 +249,7 @@ class ComplaintsBloc extends Bloc<ComplaintsEvents, ComplaintsStates> {
     } else {
       await LocalComplaintsDatasource(
         databaseHelper: DatabaseHelper(),
-        imageService: ImageService(),
+        imageService: ImageServices(),
         httpsConsumer: HttpsConsumer(),
       ).addComplaint(event.complaint);
       complaints.add(event.complaint);

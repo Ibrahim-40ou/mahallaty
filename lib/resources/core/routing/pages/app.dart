@@ -169,6 +169,7 @@ class AppPage extends StatelessWidget {
         final shouldHideNavBar = [
           ComplaintDetailsRoute.name,
           AddComplaintRoute.name,
+          EditComplaintRoute.name,
           ImageViewerRoute.name,
           ProfileInformationRoute.name,
           MapRoute.name,

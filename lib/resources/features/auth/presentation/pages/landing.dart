@@ -52,7 +52,7 @@ class LandingPage extends StatelessWidget {
           child: Scaffold(
             body: Column(
               children: [
-                _buildBackground(),
+                _buildBackground(context, isDarkMode),
                 _buildContainer(context, isDarkMode, state),
               ],
             ),
@@ -62,44 +62,43 @@ class LandingPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBackground() {
+  Widget _buildBackground(BuildContext context, bool isDarkMode) {
     return Expanded(
       child: Stack(
         fit: StackFit.expand,
         children: [
-          // The main background image
           Image.asset(
             'assets/images/1.png',
             fit: BoxFit.cover,
           ),
-          // A BackdropFilter for applying the blur effect
+          Positioned.fill(
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.bottomCenter,
+                  end: Alignment.topCenter,
+                  colors: [
+                    isDarkMode
+                        ? Colors.black.withOpacity(0.8)
+                        : Colors.white.withOpacity(0.7),
+                    isDarkMode
+                        ? Colors.black.withOpacity(0.1)
+                        : Colors.white.withOpacity(0.1),
+                  ],
+                  stops: [0.0, 1.0],
+                ),
+              ),
+            ),
+          ),
           Positioned.fill(
             child: BackdropFilter(
               filter: ImageFilter.blur(
                 sigmaX: 2,
                 sigmaY: 2,
               ),
-              child: Container(
-                color: Colors.transparent,
-              ),
+              child: SizedBox(),
             ),
           ),
-
-          // Positioned.fill(
-          //   child: Container(
-          //     decoration: BoxDecoration(
-          //       gradient: LinearGradient(
-          //         begin: Alignment.bottomCenter,
-          //         end: Alignment.topCenter,
-          //         colors: [
-          //           Colors.white.withOpacity(1), // Heavy blur at bottom
-          //           Colors.transparent.withOpacity(0.1), // No blur at the top
-          //         ],
-          //         stops: [0.0, 1.0],
-          //       ),
-          //     ),
-          //   ),
-          // ),
         ],
       ),
     );

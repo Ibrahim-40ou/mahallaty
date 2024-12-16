@@ -105,5 +105,7 @@
     "this complaint has been uploaded online": "هذه الشكوى لم ترفع الى الانترنت",
     "this complaint has not been uploaded online yet": "تم رفع هذه الشكوى الى الانترنت",
     "please connect to the internet to login": "الرجاء الاتصال بالانترنت لتسجيل الدخول",
-    "please connect to the internet to register": "الرجاء الاتصال بالانترنت لانشاء حساب"
+    "please connect to the internet to register": "الرجاء الاتصال بالانترنت لانشاء حساب",
+    "edit complaint": "تعديل الشكوى",
+    "edit": "تعديل"
 }

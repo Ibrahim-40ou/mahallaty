@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mahallaty/resources/core/utils/image_selection_state/image_selection_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'firebase_options.dart';
 import 'resources/core/routing/routes.dart';
 import 'resources/core/sizing/size_config.dart';
 import 'resources/core/theme/theme.dart';
@@ -25,9 +26,9 @@ void main() async {
   await EasyLocalization.ensureInitialized();
   preferences = await SharedPreferences.getInstance();
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  // await Firebase.initializeApp(
-  //   options: DefaultFirebaseOptions.currentPlatform,
-  // );
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(
     EasyLocalization(
       supportedLocales: const [

@@ -17,6 +17,7 @@ import '../../features/complaints/presentation/state/bloc/complaints_bloc.dart';
 import '../../features/complaints/presentation/state/cubit/counter_opacity_cubit.dart';
 import '../../features/complaints/presentation/state/cubit/image_counter_cubit.dart';
 import '../routing/routes.gr.dart';
+import '../services/image_services.dart';
 import '../services/internet_services.dart';
 import '../utils/common_functions.dart';
 import 'button.dart';
@@ -45,7 +46,7 @@ class CustomComplaintCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         context.router.push(
           ComplaintDetailsRoute(complaint: complaint),
         );
@@ -71,8 +72,9 @@ class CustomComplaintCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     CustomText(
-                      text: '${CommonFunctions().getStatus(complaint.statusId)}_1'
-                          .tr(),
+                      text:
+                          '${CommonFunctions().getStatus(complaint.statusId)}_1'
+                              .tr(),
                       color: Theme.of(context).colorScheme.primary,
                       weight: FontWeight.w600,
                       size: 6.sp,
@@ -102,6 +104,68 @@ class CustomComplaintCard extends StatelessWidget {
                                 return [
                                   PopupMenuItem(
                                     child: CustomButton(
+                                      function: () async {
+                                        if (await InternetServices()
+                                            .isInternetAvailable()) {
+                                          List<String> images = [];
+                                          for (String image
+                                              in complaint.media) {
+                                            if (image.contains('http')) {
+                                              images.add(await ImageServices()
+                                                  .downloadImage(image));
+                                            } else {
+                                              images.add(image);
+                                            }
+                                          }
+                                          complaint.media = images;
+                                          context.router.push(
+                                            EditComplaintRoute(
+                                              complaint: complaint,
+                                            ),
+                                          );
+                                        } else {
+                                          context.router.push(
+                                            EditComplaintRoute(
+                                              complaint: complaint,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      disabled: loadingState
+                                          is DeleteComplaintLoading,
+                                      child: CustomText(
+                                        text: 'edit'.tr(),
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  PopupMenuItem(
+                                    child: CustomButton(
+                                      function: () {
+                                        Clipboard.setData(
+                                          ClipboardData(
+                                            text:
+                                                'http://mahallaty0.firebaseapp.com/app/complaintsNavigator/details/${complaint.id}',
+                                          ),
+                                        );
+                                        CommonFunctions().showSnackBar(context,
+                                            'link copied to clipboard'.tr());
+                                        context.router.popForced();
+                                      },
+                                      color:
+                                          Theme.of(context).colorScheme.primary,
+                                      disabled: loadingState
+                                          is DeleteComplaintLoading,
+                                      child: CustomText(
+                                        text: 'copy link'.tr(),
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                  PopupMenuItem(
+                                    child: CustomButton(
                                       function: () {
                                         context.read<ComplaintsBloc>().add(
                                               DeleteComplaint(
@@ -113,53 +177,31 @@ class CustomComplaintCard extends StatelessWidget {
                                       },
                                       color:
                                           Theme.of(context).colorScheme.error,
-                                      disabled:
-                                          loadingState is DeleteComplaintLoading,
-                                      child: loadingState is DeleteComplaintLoading
-                                          ? CustomLoadingIndicator(
-                                              color: isDarkMode
-                                                  ? Theme.of(context)
-                                                      .textTheme
-                                                      .bodyMedium!
-                                                      .color!
-                                                  : Theme.of(context)
-                                                      .colorScheme
-                                                      .surface,
-                                            )
-                                          : CustomText(
-                                              text: 'delete'.tr(),
-                                              color: isDarkMode
-                                                  ? Theme.of(context)
-                                                      .textTheme
-                                                      .bodyMedium!
-                                                      .color
-                                                  : Theme.of(context)
-                                                      .colorScheme
-                                                      .surface,
-                                            ),
-                                    ),
-                                  ),
-                                  PopupMenuItem(
-                                    child: CustomButton(
-                                      function: () {
-                                        Clipboard.setData(
-                                          ClipboardData(
-                                            text:
-                                                'http://complaints-collector-66a94.firebaseapp.com/app/complaintsNavigator/details/${complaint.id}',
-                                          ),
-                                        );
-                                        CommonFunctions().showSnackBar(context,
-                                            'link copied to clipboard'.tr());
-                                        context.router.popForced();
-                                      },
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
-                                      disabled:
-                                          loadingState is DeleteComplaintLoading,
-                                      child: CustomText(
-                                        text: 'copy link'.tr(),
-                                        color: Colors.white,
-                                      ),
+                                      disabled: loadingState
+                                          is DeleteComplaintLoading,
+                                      child:
+                                          loadingState is DeleteComplaintLoading
+                                              ? CustomLoadingIndicator(
+                                                  color: isDarkMode
+                                                      ? Theme.of(context)
+                                                          .textTheme
+                                                          .bodyMedium!
+                                                          .color!
+                                                      : Theme.of(context)
+                                                          .colorScheme
+                                                          .surface,
+                                                )
+                                              : CustomText(
+                                                  text: 'delete'.tr(),
+                                                  color: isDarkMode
+                                                      ? Theme.of(context)
+                                                          .textTheme
+                                                          .bodyMedium!
+                                                          .color
+                                                      : Theme.of(context)
+                                                          .colorScheme
+                                                          .surface,
+                                                ),
                                     ),
                                   ),
                                 ];
@@ -258,7 +300,8 @@ class CustomComplaintCard extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: CustomText(
-                                  text: '${pageIndex + 1}/${complaint.media.length}',
+                                  text:
+                                      '${pageIndex + 1}/${complaint.media.length}',
                                   color: Colors.white,
                                   size: 4.sp,
                                 ),

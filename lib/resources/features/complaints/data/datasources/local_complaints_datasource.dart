@@ -7,7 +7,7 @@ import '../../domain/entities/complaint_entity.dart';
 
 class LocalComplaintsDatasource {
   final DatabaseHelper databaseHelper;
-  final ImageService imageService;
+  final ImageServices imageService;
   final HttpsConsumer httpsConsumer;
 
   LocalComplaintsDatasource({

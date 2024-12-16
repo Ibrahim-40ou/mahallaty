@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 
-class ImageService {
+class ImageServices {
   Future<String> downloadImage(String url) async {
     final directory = await getTemporaryDirectory();
     final filePath = join(directory.path, basename(url));

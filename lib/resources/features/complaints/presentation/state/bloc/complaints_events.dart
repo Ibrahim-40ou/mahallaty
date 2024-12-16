@@ -30,3 +30,5 @@ class DeleteOfflineComplaints extends ComplaintsEvents {}
 class SerializationEvent extends ComplaintsEvents {}
 
 class ComplaintsLogout extends ComplaintsEvents {}
+
+class ExitAddComplaints extends ComplaintsEvents {}

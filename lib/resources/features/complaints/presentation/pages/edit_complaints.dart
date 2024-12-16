@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,6 +17,7 @@ import 'package:mahallaty/resources/core/routing/routes.gr.dart';
 import 'package:mahallaty/resources/core/services/internet_services.dart';
 import 'package:mahallaty/resources/core/sizing/size_config.dart';
 import 'package:mahallaty/resources/core/utils/governorates.dart';
+import 'package:mahallaty/resources/features/complaints/domain/entities/complaint_entity.dart';
 
 import '../../../../core/utils/common_functions.dart';
 import '../../../../core/utils/image_selection_state/image_selection_bloc.dart';
@@ -29,7 +31,8 @@ import '../state/bloc/complaints_bloc.dart';
 import '../state/cubit/image_deletion_cubit.dart';
 
 @RoutePage()
-class AddComplaintPage extends StatelessWidget {
+class EditComplaintPage extends StatelessWidget {
+  final ComplaintEntity complaint;
   final _key = GlobalKey<FormState>();
 
   final TextEditingController _governorate = TextEditingController();
@@ -44,13 +47,20 @@ class AddComplaintPage extends StatelessWidget {
   List<XFile?> images = [];
   XFile? image;
 
-  AddComplaintPage({super.key});
+  EditComplaintPage({super.key, required this.complaint});
 
   @override
   Widget build(BuildContext context) {
-    _fetchLocation();
+    _getAddressFromLatLng(
+        LatLng(double.parse(complaint.lat), double.parse(complaint.lng)));
+    _description.text = complaint.description;
+    _location.text = complaint.address;
+    _governorate.text = _governorates
+        .governoratesNames[int.parse(complaint.governorateId) - 1]
+        .toString();
+    images = complaint.media.map((path) => XFile(path)).toList();
     return BlocProvider<ImageDeletionCubit>(
-      create: (BuildContext context) => ImageDeletionCubit(),
+      create: (BuildContext context) => ImageDeletionCubit()..setImages(images),
       child: BlocConsumer<ImageSelectionBloc, ImageSelectionState>(
         listener: (BuildContext context, state) {},
         builder: (BuildContext context, state) {
@@ -113,7 +123,7 @@ class AddComplaintPage extends StatelessWidget {
                                     addComplaintState,
                                   ),
                                   SizedBox(height: 2.h),
-                                  _buildAddComplaintsButton(
+                                  _buildEditComplaintsButton(
                                     context,
                                     addComplaintState,
                                   ),
@@ -148,7 +158,7 @@ class AddComplaintPage extends StatelessWidget {
         ),
         SizedBox(height: 2.h),
         CustomText(
-          text: 'add complaint'.tr(),
+          text: 'edit complaint'.tr(),
           size: 8.sp,
           weight: FontWeight.w500,
         ),
@@ -176,7 +186,7 @@ class AddComplaintPage extends StatelessWidget {
                 ),
               );
               if (latLng != null) {
-                getAddressFromLatLng(latLng);
+                _getAddressFromLatLng(latLng);
               }
             } else {
               CommonFunctions().showDialogue(
@@ -274,14 +284,6 @@ class AddComplaintPage extends StatelessWidget {
       },
     );
   }
-
-  // Widget _buildAddressField(BuildContext context) {
-  //   return CustomField(
-  //     controller: _address,
-  //     labelText: 'address'.tr(),
-  //     validatorFunction: _validateField,
-  //   );
-  // }
 
   Widget _buildDescriptionField(BuildContext context) {
     return CustomField(
@@ -538,12 +540,24 @@ class AddComplaintPage extends StatelessWidget {
                                             ClipRRect(
                                               borderRadius:
                                                   BorderRadius.circular(10),
-                                              child: Image.file(
-                                                height: 25.h,
-                                                width: 70.w,
-                                                File(imagesState[index]!.path),
-                                                fit: BoxFit.cover,
-                                              ),
+                                              child: imagesState[index]!
+                                                      .path
+                                                      .contains('http')
+                                                  ? CachedNetworkImage(
+                                                      height: 25.h,
+                                                      width: 70.w,
+                                                      fit: BoxFit.cover,
+                                                      imageUrl:
+                                                          imagesState[index]!
+                                                              .path,
+                                                    )
+                                                  : Image.file(
+                                                      height: 25.h,
+                                                      width: 70.w,
+                                                      File(imagesState[index]!
+                                                          .path),
+                                                      fit: BoxFit.cover,
+                                                    ),
                                             ),
                                             Positioned(
                                               top: 0.5.h,
@@ -603,7 +617,7 @@ class AddComplaintPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAddComplaintsButton(
+  Widget _buildEditComplaintsButton(
     BuildContext context,
     ComplaintsStates addComplaintState,
   ) {
@@ -646,7 +660,7 @@ class AddComplaintPage extends StatelessWidget {
             SizedBox(width: 2.w),
           ],
           CustomText(
-            text: 'add complaint'.tr(),
+            text: 'edit complaint'.tr(),
             color: Colors.white,
           ),
         ],
@@ -663,26 +677,26 @@ class AddComplaintPage extends StatelessWidget {
     return int.parse('$timestamp$random');
   }
 
-  void _fetchLocation() async {
-    if (await InternetServices().isInternetAvailable()) {
-      final LocationSettings locationSettings = LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: 100,
-      );
-      Position position = await Geolocator.getCurrentPosition(
-          locationSettings: locationSettings);
-      getAddressFromLatLng(LatLng(position.latitude, position.longitude));
-    } else {
-      governorate = preferences!.getString('governorateToAdd')!;
-      address = preferences!.getString('addressToAdd')!;
-      secondaryAddress = preferences!.getString('secondaryAddressToAdd')!;
-      lat = preferences!.getString('latToAdd')!;
-      lon = preferences!.getString('lonToAdd')!;
-      _location.text = '$governorate, $address, $secondaryAddress';
-    }
-  }
+  // void _fetchLocation() async {
+  //   if (await InternetServices().isInternetAvailable()) {
+  //     final LocationSettings locationSettings = LocationSettings(
+  //       accuracy: LocationAccuracy.high,
+  //       distanceFilter: 100,
+  //     );
+  //     Position position = await Geolocator.getCurrentPosition(
+  //         locationSettings: locationSettings);
+  //     getAddressFromLatLng(LatLng(position.latitude, position.longitude));
+  //   } else {
+  //     governorate = preferences!.getString('governorateToAdd')!;
+  //     address = preferences!.getString('addressToAdd')!;
+  //     secondaryAddress = preferences!.getString('secondaryAddressToAdd')!;
+  //     lat = preferences!.getString('latToAdd')!;
+  //     lon = preferences!.getString('lonToAdd')!;
+  //     _location.text = '$governorate, $address, $secondaryAddress';
+  //   }
+  // }
 
-  Future<void> getAddressFromLatLng(LatLng latLng) async {
+  Future<void> _getAddressFromLatLng(LatLng latLng) async {
     List<Placemark> placeMarks =
         await placemarkFromCoordinates(latLng.latitude, latLng.longitude);
     governorate = placeMarks[0].locality!;

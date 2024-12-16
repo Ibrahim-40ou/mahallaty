@@ -29,7 +29,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="http" android:host="tasks-collector-66a94.firebaseapp.com" />
+                <data android:scheme="http" android:host="mahallaty0.firebaseapp.com" />
                 <data android:scheme="https" />
             </intent-filter>
         </activity>
