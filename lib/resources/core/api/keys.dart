@@ -1,4 +1,4 @@
 class APIKeys {
-  static const map = 'AIzaSyACmqHzxi6mn4wd_pDXA9dTAsJXeIO3Hn8';
+  static const map = 'AIzaSyDPW-B1sPuv2RirdPJsaSF-mI_FJf62jXo';
   static const predictions = 'AIzaSyDUlP2YVc1fCM00vm1VBCXzF9tWpufwTvg';
 }

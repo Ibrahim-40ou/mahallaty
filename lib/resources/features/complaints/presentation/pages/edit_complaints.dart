@@ -51,8 +51,6 @@ class EditComplaintPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    _getAddressFromLatLng(
-        LatLng(double.parse(complaint.lat), double.parse(complaint.lng)));
     _description.text = complaint.description;
     _location.text = complaint.address;
     _governorate.text = _governorates
@@ -629,7 +627,7 @@ class EditComplaintPage extends StatelessWidget {
                   complaint: ComplaintModel(
                     id: _generateUniqueId(),
                     description: _description.text.trim(),
-                    address: '$governorate, $address, $secondaryAddress',
+                    address: _location.text,
                     governorateId: _governorates
                         .governoratesMap[_governorate.text]
                         .toString(),
